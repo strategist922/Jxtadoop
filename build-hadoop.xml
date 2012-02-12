@@ -1,0 +1,249 @@
+<project name="Jxtadoop" default="compile-classes"
+	basedir="/home/franck/Documents/workspaces/workspaces/Hadoop/Jxtadoop"
+   xmlns:ivy="antlib:org.apache.ivy.ant"> 
+   
+  <!-- Target data properties -->
+  <property name="name" value="jxtadoop"/>
+  <property name="version" value="0.5.0"/>
+  <property name="final.name" value="${name}-${version}"/>
+  
+  <!-- Target data properties -->
+  <property name="build.dir" value="${basedir}/build"/>
+  <property name="build.src" value="${build.dir}/src"/>
+  <property name="build.classes" value="${build.dir}/classes"/>
+  <property name="distrib.dir" value="${basedir}/distrib"/>
+  <property name="distriblib.dir" value="${distrib.dir}/lib"/>
+  <property name="distribbin.dir" value="${distrib.dir}/bin"/>
+  <property name="distribetc.dir" value="${distrib.dir}/etc"/>
+  
+  <!-- Source data properties -->
+  <property name="conf.dir" value="${basedir}/etc"/>
+  <property name="src.dir" value="${basedir}/src"/> 
+  <property name="lib.dir" value="${basedir}/lib"/>
+  <property name="bin.dir" value="${basedir}/scripts"/>
+
+<!-- Properties related to compilation rules -->  
+  <property name="build.encoding" value="ISO-8859-1"/>
+  <property name="javac.debug" value="on"/>
+  <property name="javac.optimize" value="on"/>
+  <property name="javac.deprecation" value="off"/>
+  <property name="javac.version" value="1.6"/>
+  <property name="javac.args" value=""/>
+  <property name="javac.args.warnings" value="-Xlint:unchecked"/>
+  
+  <property name="namenode.dir" value="${basedir}/distrib/namenode"/>  
+  <property name="namenode.bindir" value="${namenode.dir}/bin"/>
+  <property name="namenode.libdir" value="${namenode.dir}/lib"/>
+  <property name="namenode.etcdir" value="${namenode.dir}/etc"/>
+  <property name="namenode.logdir" value="${namenode.dir}/logs"/>
+  <property name="namenode.vardir" value="${namenode.dir}/var"/>
+  <property name="namenode.tmpdir" value="${namenode.dir}/tmp"/>
+	  
+  <property name="datanode.dir" value="${basedir}/distrib/datanode"/>  
+  <property name="datanode.bindir" value="${datanode.dir}/bin"/>
+  <property name="datanode.libdir" value="${datanode.dir}/lib"/>
+  <property name="datanode.etcdir" value="${datanode.dir}/etc"/>
+  <property name="datanode.logdir" value="${datanode.dir}/logs"/>
+  <property name="datanode.vardir" value="${datanode.dir}/var"/>
+  <property name="datanode.tmpdir" value="${datanode.dir}/tmp"/>
+	
+<path id="classpath">
+    <pathelement location="${build.classes}"/>
+    <pathelement location="${build.dir}"/>
+    <fileset dir="${lib.dir}">
+      <include name="**/*.jar" />
+      <exclude name="**/excluded/" />
+    </fileset>
+    <pathelement location="${conf.dir}"/>
+</path>
+
+<target name="init">    
+    <mkdir dir="${build.dir}"/>
+    <mkdir dir="${build.classes}"/>
+    <mkdir dir="${build.src}"/>
+    <mkdir dir="${distrib.dir}"/>
+    <mkdir dir="${distribbin.dir}"/>
+    <mkdir dir="${distriblib.dir}"/>
+    <mkdir dir="${distribetc.dir}"/>
+    
+    <copy todir="${distriblib.dir}" includeEmptyDirs="false">
+      <fileset dir="${lib.dir}">
+      	<include name="commons-cli-1.2.jar" />  
+      	<include name="commons-logging-1.0.4.jar" />
+      	<include name="commons-net-1.4.1.jar" />
+      	<include name="jets3t-0.6.1.jar" />
+      	<include name="kfs-0.2.2.jar" />
+      	<include name="log4j-1.2.15.jar" />
+		<include name="xmlenc-0.52.jar" />
+      </fileset>
+    </copy>  
+    
+    <copy todir="${distribbin.dir}" includeEmptyDirs="false">
+    	<fileset dir="${bin.dir}">
+    		<include name="start-namenode.sh" />
+    		<include name="start-datanode.sh" />
+    		<include name="hadoop-daemon.sh" />
+			<include name="hadoop-env.sh" />
+    		<include name="hadoop-config.sh" />
+    		<include name="hadoop" />
+    	</fileset>
+    </copy>	
+    
+    <copy todir="${distribetc.dir}" includeEmptyDirs="false">
+    	<fileset dir="${conf.dir}">
+			<include name="configuration.xsl" />
+    		<include name="core-default.xml" />
+    		<include name="core-site.xml" />
+    		<include name="hadoop-policy.xml" />
+    		<include name="hdfs-default.xml" />
+    		<include name="hdfs-site.xml" />
+    		<include name="hosts.allow" />
+    		<include name="hosts.deny" />
+    		<include name="log4j.properties" />
+    	</fileset>
+    </copy>      
+</target>
+
+<target name="compile-classes" depends="init">
+    <javac 
+    	encoding="${build.encoding}" 
+     	srcdir="${src.dir}"	
+     	includes="org/apache/jxtadoop/**/*.java"
+     	destdir="${build.classes}"
+     	debug="${javac.debug}"
+     	optimize="${javac.optimize}"
+     	target="${javac.version}"
+     	source="${javac.version}"
+     	deprecation="${javac.deprecation}">
+			<compilerarg line="${javac.args} ${javac.args.warnings}" />
+			<classpath refid="classpath"/>
+    </javac>     
+</target>
+
+<target name="jar" depends="compile-classes" description="Make hadoop.jar">
+    <jar jarfile="${distriblib.dir}/${final.name}-hdfs.jar"
+         basedir="${build.classes}">
+      <manifest>
+        <section name="org/apache/jxtadoop">
+          <attribute name="Implementation-Title" value="Jxtadoop"/>
+          <attribute name="Implementation-Version" value="${version}"/>
+          <attribute name="Implementation-Vendor" value="Apache"/>
+        </section>
+      </manifest>
+    </jar>
+</target>
+
+<target name="namenode" depends="jar" description="Build the namenode distrib">
+	<mkdir dir="${namenode.dir}"/>
+	<mkdir dir="${namenode.bindir}"/>
+	<mkdir dir="${namenode.libdir}"/>
+	<mkdir dir="${namenode.etcdir}"/>
+	<mkdir dir="${namenode.logdir}"/>
+	<mkdir dir="${namenode.vardir}/pids"/>
+	<mkdir dir="${namenode.tmpdir}"/>
+	
+	<copy todir="${namenode.libdir}" includeEmptyDirs="false">
+		<fileset dir="${distriblib.dir}">
+	      	<include name="commons-cli-1.2.jar" />  
+	      	<include name="commons-logging-1.0.4.jar" />
+	      	<include name="commons-net-1.4.1.jar" />
+	      	<include name="jets3t-0.6.1.jar" />
+	      	<include name="kfs-0.2.2.jar" />
+	      	<include name="log4j-1.2.15.jar" />
+			<include name="xmlenc-0.52.jar" />
+			<include name="${final.name}-hdfs.jar" />
+		</fileset>
+	</copy>
+	
+    <copy todir="${namenode.bindir}" includeEmptyDirs="false">
+      <fileset dir="${distribbin.dir}">
+		<include name="start-namenode.sh" />
+		<include name="hadoop-daemon.sh" />
+		<include name="hadoop-env.sh" />
+		<include name="hadoop-config.sh" />
+		<include name="hadoop" />
+      </fileset>
+    </copy> 
+	
+    <chmod perm="ugo+rx">
+		<fileset dir="${namenode.bindir}" />
+	</chmod>
+	
+	<copy todir="${namenode.etcdir}" includeEmptyDirs="false">
+		<fileset dir="${distribetc.dir}">
+			<include name="configuration.xsl" />
+    		<include name="core-default.xml" />
+    		<include name="core-site.xml" />
+    		<include name="hadoop-policy.xml" />
+    		<include name="hdfs-default.xml" />
+    		<include name="hdfs-site.xml" />
+    		<include name="hosts.allow" />
+    		<include name="hosts.deny" />
+    		<include name="log4j.properties" />	
+		</fileset>
+	</copy>  
+	
+	<zip destfile="${basedir}/distrib/${name}-namenode-${version}.zip"
+	       basedir="${namenode.dir}"
+	       update="true"
+	/>
+</target>
+
+<target name="datanode" depends="jar" description="Build the datanode distrib">
+	<mkdir dir="${datanode.dir}"/>
+	<mkdir dir="${datanode.bindir}"/>
+	<mkdir dir="${datanode.libdir}"/>
+	<mkdir dir="${datanode.etcdir}"/>
+	<mkdir dir="${datanode.logdir}"/>
+	<mkdir dir="${datanode.vardir}/pids"/>
+	<mkdir dir="${datanode.tmpdir}"/>
+	
+	<copy todir="${datanode.libdir}" includeEmptyDirs="false">
+		<fileset dir="${distriblib.dir}">
+			<include name="commons-cli-1.2.jar" />  
+			<include name="commons-logging-1.0.4.jar" />
+			<include name="commons-net-1.4.1.jar" />
+			<include name="jets3t-0.6.1.jar" />
+			<include name="kfs-0.2.2.jar" />
+			<include name="log4j-1.2.15.jar" />
+			<include name="xmlenc-0.52.jar" />
+			<include name="${final.name}-hdfs.jar" />
+		</fileset>
+	</copy>  	
+   
+	<copy todir="${datanode.bindir}" includeEmptyDirs="false">
+		<fileset dir="${distribbin.dir}">
+			<include name="start-datanode.sh" />
+			<include name="hadoop-daemon.sh" />
+			<include name="hadoop-env.sh" />
+			<include name="hadoop-config.sh" />
+			<include name="hadoop" />
+		</fileset>
+	</copy>
+	
+	<chmod perm="ugo+rx">
+		<fileset dir="${datanode.bindir}" />
+	</chmod>
+
+	<copy todir="${datanode.etcdir}" includeEmptyDirs="false">
+		<fileset dir="${distribetc.dir}">
+			<include name="configuration.xsl" />
+		    <include name="core-default.xml" />
+		    <include name="core-site.xml" />
+		    <include name="hadoop-policy.xml" />
+		    <include name="hdfs-default.xml" />
+		    <include name="hdfs-site.xml" />
+		    <include name="hosts.allow" />
+		    <include name="hosts.deny" />
+			<include name="log4j.properties" />
+     	</fileset>
+   </copy> 
+	
+	<zip destfile="${basedir}/distrib/${name}-datanode-${version}.zip"
+      basedir="${datanode.dir}"
+      update="true"
+	 />
+	
+</target>
+	
+</project>

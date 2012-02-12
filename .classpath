@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="lib/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="lib/commons-cli-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/xmlenc-0.52.jar"/>
+	<classpathentry kind="lib" path="lib/jets3t-0.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/kfs-0.2.2.jar"/>
+	<classpathentry kind="lib" path="lib/commons-net-1.4.1.jar"/>
+	<classpathentry kind="lib" path="lib/jxse-2.7.jar" sourcepath="/home/franck/Documents/sandbox/libraries/jxta/2.7">
+		<attributes>
+			<attribute name="javadoc_location" value="file:/home/franck/Documents/Javadocs/jxse-27-javadoc/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/httptunnel-0.92.jar"/>
+	<classpathentry kind="lib" path="lib/netty-3.2.2.Final.jar"/>
+	<classpathentry kind="lib" path="lib/bcprov-jdk15-140.jar"/>
+	<classpathentry kind="lib" path="lib/log4j-1.2.16.jar"/>
+	<classpathentry kind="lib" path="lib/derby-10.5.3.0_1.jar"/>
+	<classpathentry kind="lib" path="lib/h2-1.1.118.jar"/>
+	<classpathentry kind="lib" path="lib/org.apache.felix.main-2.0.1.jar"/>
+	<classpathentry kind="lib" path="lib/servlet-api-2.5.20110712.jar"/>
+	<classpathentry kind="lib" path="lib/jetty-4.2.12.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
